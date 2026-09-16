@@ -1,0 +1,168 @@
+All Queries.
+
+
+1. Find all active customers.
+select customer_id, customer_number, CONCAT(first_name, ' ', last_name) AS customer_name, email, phone, customer_status
+from customers
+where customer_status = 'ACTIVE';
+2. Find all savings accounts.
+select account_id, account_number, customer_id, balance, status
+from accounts
+where account_type = 'SAVINGS';
+3. Find accounts with balance > ₹1 lakh.
+select account_id, account_number, account_type, balance
+from accounts
+where balance > 100000.00;
+4. Find all ATM transactions.
+select transaction_id, account_id, amount, transaction_date, transaction_status, location
+from transactions
+where transaction_mode = 'ATM';
+
+5. Find customers from Delhi.
+select customer_id, customer_number, CONCAT(first_name, ' ', last_name) AS customer_name, city, state
+from customers
+where city = 'New Delhi' OR state = 'Delhi';
+
+6. Total balance by branch.
+select b.branch_id, b.branch_name, SUM(a.balance) AS total_balance
+from branches b
+join accounts a ON b.branch_id = a.branch_id
+group BY b.branch_id, b.branch_name;
+
+7. Average balance by account type.
+select account_type, ROUND(AVG(balance), 2) AS avg_balance
+from accounts
+group BY account_type;
+
+8. Number of accounts per customer.
+ select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, COUNT(a.account_id) AS account_count
+from customers c
+left join accounts a ON c.customer_id = a.customer_id
+group by c.customer_id, customer_name;
+9. Total transaction amount per customer.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, COALESCE(SUM(t.amount), 0.00) AS total_transacted
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+join transactions t ON a.account_id = t.account_id
+group by c.customer_id, customer_name;
+10. Total transactions by mode.
+select transaction_mode, COUNT(*) AS txn_count, SUM(amount) AS total_amount
+from transactions
+group by transaction_mode;
+11. Customer + Account details.
+select c.customer_number, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.account_type, a.balance
+from customers c
+join accounts a ON c.customer_id = a.customer_id;
+12. Customer + Account + Branch.
+select CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.account_type, a.balance, b.branch_name, b.city AS branch_city
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+join branches b ON a.branch_id = b.branch_id;
+13. Customers having cards.
+select DISTINCT c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, c.phone
+from customers c
+join cards cd ON c.customer_id = cd.customer_id;
+14. Customers without cards.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, c.email
+from customers c
+left join cards cd ON c.customer_id = cd.customer_id
+where cd.card_id IS NULL;
+15. Customers having multiple accounts.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, COUNT(a.account_id) AS total_accounts
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+group by c.customer_id, customer_name
+having count(a.account_id) > 1;
+16. Above-average balance customers.
+select concat(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance
+from accounts a
+join customers c ON a.customer_id = c.customer_id
+where a.balance > (SELECT AVG(balance) FROM accounts);
+17. Second-highest balance.
+select DISTINCT balance
+from accounts
+order by balance DESC
+LIMIT 1 OFFSET 1;
+18. Customers above their branch average.
+select concat(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.branch_id, a.balance
+from accounts a
+join customers c ON a.customer_id = c.customer_id
+where a.balance > (
+    select avg(sub.balance)
+    from accounts sub
+    where sub.branch_id = a.branch_id
+);
+19. Highest transaction customer.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, t.amount, t.transaction_id, t.transaction_date
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+join transactions t ON a.account_id = t.account_id
+order by t.amount DESC
+limit 1;
+20. Branch with highest total balance.
+select b.branch_id, b.branch_name, SUM(a.balance) AS total_balance
+from branches b
+join accounts a ON b.branch_id = a.branch_id
+group by b.branch_id, b.branch_name
+order by total_balance DESC
+limit 1;
+21. Customer-wise total balance.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, sum(a.balance) AS aggregate_balance
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+group by c.customer_id, customer_name;
+22. Customer-wise transaction volume.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, count(t.transaction_id) AS total_txns, COALESCE(SUM(t.amount), 0.00) AS total_amount
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+join transactions t ON a.account_id = t.account_id
+group by c.customer_id, customer_name;
+23. Branch-wise average balance.
+select b.branch_id, b.branch_name, ROUND(AVG(a.balance), 2) AS avg_balance
+from branches b
+join accounts a ON b.branch_id = a.branch_id
+group by b.branch_id, b.branch_name;
+24. Above-average customers.
+with customer_totals AS (
+    select customer_id, SUM(balance) AS total_balance
+    from accounts
+    group by customer_id
+)
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, ct.total_balance
+from customer_totals ct
+join customers c ON ct.customer_id = c.customer_id
+where ct.total_balance > (SELECT AVG(total_balance) FROM customer_totals);
+25. Top customers per branch.
+with branch_ranked AS (
+    select b.branch_name, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance,
+           ROW_NUMBER() OVER (PARTITION BY a.branch_id ORDER BY a.balance DESC) AS rnk
+    from accounts a
+    join customers c ON a.customer_id = c.customer_id
+    join branches b ON a.branch_id = b.branch_id
+)
+select branch_name, customer_name, account_number, balance
+from branch_ranked
+where rnk = 1;
+26. Rank customers by balance.
+select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, sum(a.balance) AS total_balance,
+       DENSE_RANK() OVER (ORDER BY SUM(a.balance) DESC) AS balance_rank
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+group by c.customer_id, customer_name;
+27. Top 3 customers per branch.
+with ranked_branch_cust AS (
+    select b.branch_name, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance,
+           DENSE_RANK() OVER (PARTITION BY a.branch_id ORDER BY a.balance DESC) AS branch_rank
+    from accounts a
+    join customers c ON a.customer_id = c.customer_id
+    join branches b ON a.branch_id = b.branch_id
+)
+select branch_name, branch_rank, customer_name, account_number, balance
+from ranked_branch_cust
+where branch_rank <= 3;
+28. Rank transactions per customer.
+select CONCAT(c.first_name, ' ', c.last_name) AS customer_name, t.transaction_id, t.transaction_type, t.amount, t.transaction_date,
+       DENSE_RANK() OVER (PARTITION BY c.customer_id ORDER BY t.amount DESC) AS txn_rank
+from customers c
+join accounts a ON c.customer_id = a.customer_id
+join transactions t ON a.account_id = t.account_id;

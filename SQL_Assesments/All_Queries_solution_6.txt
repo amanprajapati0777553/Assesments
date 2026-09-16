@@ -1,0 +1,558 @@
+MySQL Shell 8.0.43
+
+Copyright (c) 2016, 2025, Oracle and/or its affiliates.
+Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
+Other names may be trademarks of their respective owners.
+
+Type '\help' or '\?' for help; '\quit' to exit.
+ MySQL  JS > \sql
+Switching to SQL mode... Commands end with ;
+ MySQL  SQL > \connect root@localhost
+Creating a session to 'root@localhost'
+Fetching global names for auto-completion... Press ^C to stop.
+Your MySQL connection id is 8 (X protocol)
+Server version: 8.0.43 MySQL Community Server - GPL
+No default schema selected; type \use <schema> to set one.
+ MySQL  localhost:33060+ ssl  SQL > use bank_management_system;
+Default schema set to `bank_management_system`.
+Fetching global names, object names from `bank_management_system` for auto-completion... Press ^C to stop.
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > shows tables;
+ERROR: 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'shows tables' at line 1
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > show tables;
++----------------------------------+
+| Tables_in_bank_management_system |
++----------------------------------+
+| accounts                         |
+| beneficiaries                    |
+| branches                         |
+| card_transactions                |
+| cards                            |
+| customers                        |
+| employees                        |
+| transactions                     |
+| transfers                        |
++----------------------------------+
+9 rows in set (0.0022 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > SELECT 'branches' AS tbl, COUNT(*) FROM branches
+                                                         -> UNION ALL
+                                                         -> SELECT 'customers', COUNT(*) FROM customers
+                                                         -> UNION ALL
+                                                         -> SELECT 'employees', COUNT(*) FROM employees
+                                                         -> UNION ALL
+                                                         -> SELECT 'accounts', COUNT(*) FROM accounts
+                                                         -> UNION ALL
+                                                         -> SELECT 'transactions', COUNT(*) FROM transactions
+                                                         -> UNION ALL
+                                                         -> SELECT 'cards', COUNT(*) FROM cards
+                                                         -> UNION ALL
+                                                         -> SELECT 'card_transactions', COUNT(*) FROM card_transactions
+                                                         -> UNION ALL
+                                                         -> SELECT 'beneficiaries', COUNT(*) FROM beneficiaries
+                                                         -> UNION ALL
+                                                         -> SELECT 'transfers', COUNT(*) FROM transfers;
++-------------------+----------+
+| tbl               | COUNT(*) |
++-------------------+----------+
+| branches          |        5 |
+| customers         |       10 |
+| employees         |       10 |
+| accounts          |       15 |
+| transactions      |       30 |
+| cards             |       10 |
+| card_transactions |        0 |
+| beneficiaries     |       10 |
+| transfers         |       15 |
++-------------------+----------+
+9 rows in set (0.0334 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > SELECT customer_id, customer_number, CONCAT(first_name, ' ', last_name) AS customer_name, email, phone, customer_status
+                                                         -> FROM customers
+                                                         -> WHERE customer_status = 'ACTIVE';
++-------------+-----------------+---------------+------------------+------------+-----------------+
+| customer_id | customer_number | customer_name | email            | phone      | customer_status |
++-------------+-----------------+---------------+------------------+------------+-----------------+
+|           1 | CUST1001        | Arun Kumar    | arun@gmail.com   | 9000000001 | ACTIVE          |
+|           2 | CUST1002        | Rahul Sharma  | rahul@gmail.com  | 9000000002 | ACTIVE          |
+|           3 | CUST1003        | Priya Singh   | priya@gmail.com  | 9000000003 | ACTIVE          |
+|           4 | CUST1004        | Ankit Verma   | ankit@gmail.com  | 9000000004 | ACTIVE          |
+|           5 | CUST1005        | Neha Gupta    | neha@gmail.com   | 9000000005 | ACTIVE          |
+|           6 | CUST1006        | Rohit Yadav   | rohit@gmail.com  | 9000000006 | ACTIVE          |
+|           7 | CUST1007        | Sneha Patel   | sneha@gmail.com  | 9000000007 | ACTIVE          |
+|           8 | CUST1008        | Vikas Mehta   | vikas@gmail.com  | 9000000008 | ACTIVE          |
+|           9 | CUST1009        | Kavita Joshi  | kavita@gmail.com | 9000000009 | ACTIVE          |
+|          10 | CUST1010        | Mohit Agarwal | mohit@gmail.com  | 9000000010 | ACTIVE          |
++-------------+-----------------+---------------+------------------+------------+-----------------+
+10 rows in set (0.0011 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > SELECT account_id, account_number, customer_id, balance, status
+                                                         -> FROM accounts
+                                                         -> WHERE account_type = 'SAVINGS';
++------------+----------------+-------------+-----------+--------+
+| account_id | account_number | customer_id | balance   | status |
++------------+----------------+-------------+-----------+--------+
+|          1 | 100000000001   |           1 |  85000.00 | ACTIVE |
+|          3 | 100000000003   |           2 | 125000.00 | ACTIVE |
+|          4 | 100000000004   |           3 |  95000.00 | ACTIVE |
+|          6 | 100000000006   |           5 |  67000.00 | ACTIVE |
+|          8 | 100000000008   |           7 |  43000.00 | ACTIVE |
+|         10 | 100000000010   |           9 |  89000.00 | ACTIVE |
+|         11 | 100000000011   |          10 | 156000.00 | ACTIVE |
+|         14 | 100000000014   |           6 |  72000.00 | ACTIVE |
+|         15 | 100000000015   |           8 | 198000.00 | ACTIVE |
++------------+----------------+-------------+-----------+--------+
+9 rows in set (0.0010 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > SELECT account_id, account_number, account_type, balance
+                                                         -> FROM accounts
+                                                         -> where balance > 100000.00;
++------------+----------------+--------------+-----------+
+| account_id | account_number | account_type | balance   |
++------------+----------------+--------------+-----------+
+|          2 | 100000000002   | CURRENT      | 250000.00 |
+|          3 | 100000000003   | SAVINGS      | 125000.00 |
+|          5 | 100000000005   | CURRENT      | 310000.00 |
+|          7 | 100000000007   | SALARY       | 145000.00 |
+|          9 | 100000000009   | CURRENT      | 275000.00 |
+|         11 | 100000000011   | SAVINGS      | 156000.00 |
+|         12 | 100000000012   | FD           | 500000.00 |
+|         13 | 100000000013   | CURRENT      | 185000.00 |
+|         15 | 100000000015   | SAVINGS      | 198000.00 |
++------------+----------------+--------------+-----------+
+9 rows in set (0.0027 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select transaction_id, account_id, amount, transaction_date, transaction_status, location
+                                                         -> from transactions
+                                                         -> where transaction_mode = 'ATM';
++----------------+------------+----------+---------------------+--------------------+-----------+
+| transaction_id | account_id | amount   | transaction_date    | transaction_status | location  |
++----------------+------------+----------+---------------------+--------------------+-----------+
+|           1002 |          1 | 10000.00 | 2026-01-10 14:20:00 | SUCCESS            | Ghaziabad |
+|           1007 |          3 | 15000.00 | 2026-01-08 18:20:00 | SUCCESS            | Noida     |
+|           1011 |          5 | 20000.00 | 2026-01-11 13:25:00 | SUCCESS            | Ghaziabad |
+|           1015 |          7 | 10000.00 | 2026-01-09 17:30:00 | SUCCESS            | Noida     |
+|           1019 |          9 | 30000.00 | 2026-01-13 15:45:00 | SUCCESS            | Delhi     |
+|           1023 |         11 | 12000.00 | 2026-01-15 16:30:00 | SUCCESS            | Meerut    |
+|           1028 |         14 |  8000.00 | 2026-01-20 18:00:00 | SUCCESS            | Noida     |
++----------------+------------+----------+---------------------+--------------------+-----------+
+7 rows in set (0.0013 sec)                                  select customer_id, customer_number, CONCAT(first_name, ' ', last_name) AS customer_name, city, state
+                                                         -> from customersr_id, customer_number, CONCAT(first_name, ' ', last_name) AS customer_name, city, state
+                                                         -> where city = 'New Delhi' OR state = 'Delhi';
++-------------+-----------------+---------------+-----------+-------+
+| customer_id | customer_number | customer_name | city      | state |
++-------------+-----------------+---------------+-----------+-------+
+|           3 | CUST1003        | Priya Singh   | New Delhi | Delhi |
+|           8 | CUST1008        | Vikas Mehta   | New Delhi | Delhi |
++-------------+-----------------+---------------+-----------+-------+
+2 rows in set (0.0016 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select b.branch_id, b.branch_name, SUM(a.balance) AS total_balance                                    select b.branch_id, b.branch_name, SUM(a.balance) AS total_balance
+                                                         -> from branches b
+                                                         -> join accounts a ON b.branch_id = a.branch_id
+                                                         -> group BY b.branch_id, b.branch_name;
++-----------+----------------------+---------------+
+| branch_id | branch_name          | total_balance |
++-----------+----------------------+---------------+
+|         1 | RRGI Main Branch     |     712000.00 |
+|         2 | Delhi Central Branch |     753000.00 |
+|         3 | Noida Branch         |     842000.00 |
+|         4 | Meerut Branch        |     245000.00 |
+|         5 | Lucknow Branch       |      43000.00 |
++-----------+----------------------+---------------+
+5 rows in set (0.0037 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL >
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select account_type, ROUND(AVG(balance), 2) AS avg_balance
+                                                         -> from accounts
+                                                         -> group BY account_type;
++--------------+-------------+
+| account_type | avg_balance |
++--------------+-------------+
+| SAVINGS      |   103333.33 |
+| CURRENT      |   255000.00 |
+| SALARY       |   145000.00 |
+| FD           |   500000.00 |
++--------------+-------------+
+4 rows in set (0.0031 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL >
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, COUNT(a.account_id) AS account_count
+                                                         -> from customers c
+                                                         -> left join accounts a ON c.customer_id = a.customer_id
+                                                         -> group by c.customer_id, customer_name;
++-------------+---------------+---------------+
+| customer_id | customer_name | account_count |
++-------------+---------------+---------------+
+|           1 | Arun Kumar    |             2 |
+|           2 | Rahul Sharma  |             2 |
+|           3 | Priya Singh   |             2 |
+|           4 | Ankit Verma   |             1 |
+|           5 | Neha Gupta    |             1 |
+|           6 | Rohit Yadav   |             2 |
+|           7 | Sneha Patel   |             1 |
+|           8 | Vikas Mehta   |             2 |
+|           9 | Kavita Joshi  |             1 |
+|          10 | Mohit Agarwal |             1 |
++-------------+---------------+---------------+
+10 rows in set (0.0012 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select transaction_mode, COUNT(*) AS txn_count, SUM(amount) AS total_amount
+                                                         -> from transactions
+                                                         -> group by transaction_mode;
++------------------+-----------+--------------+
+| transaction_mode | txn_count | total_amount |
++------------------+-----------+--------------+
+| BRANCH           |         5 |    690000.00 |
+| ATM              |         7 |    105000.00 |
+| UPI              |         9 |    245500.00 |
+| NEFT             |         6 |    390000.00 |
+| MOBILE_APP       |         1 |      2500.00 |
+| NET_BANKING      |         2 |     37000.00 |
++------------------+-----------+--------------+
+6 rows in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL >
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_number, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.account_type, a.balance
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id;
++-----------------+---------------+----------------+--------------+-----------+
+| customer_number | customer_name | account_number | account_type | balance   |
++-----------------+---------------+----------------+--------------+-----------+
+| CUST1001        | Arun Kumar    | 100000000001   | SAVINGS      |  85000.00 |
+| CUST1001        | Arun Kumar    | 100000000002   | CURRENT      | 250000.00 |
+| CUST1002        | Rahul Sharma  | 100000000003   | SAVINGS      | 125000.00 |
+| CUST1002        | Rahul Sharma  | 100000000012   | FD           | 500000.00 |
+| CUST1003        | Priya Singh   | 100000000004   | SAVINGS      |  95000.00 |
+| CUST1003        | Priya Singh   | 100000000013   | CURRENT      | 185000.00 |
+| CUST1004        | Ankit Verma   | 100000000005   | CURRENT      | 310000.00 |
+| CUST1005        | Neha Gupta    | 100000000006   | SAVINGS      |  67000.00 |
+| CUST1006        | Rohit Yadav   | 100000000007   | SALARY       | 145000.00 |
+| CUST1006        | Rohit Yadav   | 100000000014   | SAVINGS      |  72000.00 |
+| CUST1007        | Sneha Patel   | 100000000008   | SAVINGS      |  43000.00 |
+| CUST1008        | Vikas Mehta   | 100000000009   | CURRENT      | 275000.00 |
+| CUST1008        | Vikas Mehta   | 100000000015   | SAVINGS      | 198000.00 |
+| CUST1009        | Kavita Joshi  | 100000000010   | SAVINGS      |  89000.00 |
+| CUST1010        | Mohit Agarwal | 100000000011   | SAVINGS      | 156000.00 |
++-----------------+---------------+----------------+--------------+-----------+
+15 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.account_type, a.balance, b.branch_name, b.city AS branch_city
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> join branches b ON a.branch_id = b.branch_id;
++---------------+----------------+--------------+-----------+----------------------+-------------+
+| customer_name | account_number | account_type | balance   | branch_name          | branch_city |
++---------------+----------------+--------------+-----------+----------------------+-------------+
+| Arun Kumar    | 100000000001   | SAVINGS      |  85000.00 | RRGI Main Branch     | Ghaziabad   |
+| Arun Kumar    | 100000000002   | CURRENT      | 250000.00 | RRGI Main Branch     | Ghaziabad   |
+| Ankit Verma   | 100000000005   | CURRENT      | 310000.00 | RRGI Main Branch     | Ghaziabad   |
+| Neha Gupta    | 100000000006   | SAVINGS      |  67000.00 | RRGI Main Branch     | Ghaziabad   |
+| Priya Singh   | 100000000004   | SAVINGS      |  95000.00 | Delhi Central Branch | New Delhi   |
+| Vikas Mehta   | 100000000009   | CURRENT      | 275000.00 | Delhi Central Branch | New Delhi   |
+| Priya Singh   | 100000000013   | CURRENT      | 185000.00 | Delhi Central Branch | New Delhi   |
+| Vikas Mehta   | 100000000015   | SAVINGS      | 198000.00 | Delhi Central Branch | New Delhi   |
+| Rahul Sharma  | 100000000003   | SAVINGS      | 125000.00 | Noida Branch         | Noida       |
+| Rohit Yadav   | 100000000007   | SALARY       | 145000.00 | Noida Branch         | Noida       |
+| Rahul Sharma  | 100000000012   | FD           | 500000.00 | Noida Branch         | Noida       |
+| Rohit Yadav   | 100000000014   | SAVINGS      |  72000.00 | Noida Branch         | Noida       |
+| Kavita Joshi  | 100000000010   | SAVINGS      |  89000.00 | Meerut Branch        | Meerut      |
+| Mohit Agarwal | 100000000011   | SAVINGS      | 156000.00 | Meerut Branch        | Meerut      |
+| Sneha Patel   | 100000000008   | SAVINGS      |  43000.00 | Lucknow Branch       | Lucknow     |
++---------------+----------------+--------------+-----------+----------------------+-------------+
+15 rows in set (0.0016 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select DISTINCT c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, c.phone
+                                                         -> from customers c
+                                                         -> join cards cd ON c.customer_id = cd.customer_id;
++-------------+---------------+------------+
+| customer_id | customer_name | phone      |
++-------------+---------------+------------+
+|           1 | Arun Kumar    | 9000000001 |
+|           2 | Rahul Sharma  | 9000000002 |
+|           3 | Priya Singh   | 9000000003 |
+|           4 | Ankit Verma   | 9000000004 |
+|           5 | Neha Gupta    | 9000000005 |
+|           6 | Rohit Yadav   | 9000000006 |
+|           7 | Sneha Patel   | 9000000007 |
+|           8 | Vikas Mehta   | 9000000008 |
+|           9 | Kavita Joshi  | 9000000009 |
+|          10 | Mohit Agarwal | 9000000010 |
++-------------+---------------+------------+
+10 rows in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, c.email
+                                                         -> from customers c
+                                                         -> left join cards cd ON c.customer_id = cd.customer_id
+                                                         -> where cd.card_id IS NULL;
+Empty set (0.0011 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, COUNT(a.account_id) AS total_accounts
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> group by c.customer_id, customer_name
+                                                         -> having count(a.account_id) > 1;
++-------------+---------------+----------------+
+| customer_id | customer_name | total_accounts |
++-------------+---------------+----------------+
+|           1 | Arun Kumar    |              2 |
+|           2 | Rahul Sharma  |              2 |
+|           3 | Priya Singh   |              2 |
+|           6 | Rohit Yadav   |              2 |
+|           8 | Vikas Mehta   |              2 |
++-------------+---------------+----------------+
+5 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select concat(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance
+                                                         -> from accounts a
+                                                         -> join customers c ON a.customer_id = c.customer_id
+                                                         -> where a.balance > (SELECT AVG(balance) FROM accounts);
++---------------+----------------+-----------+
+| customer_name | account_number | balance   |
++---------------+----------------+-----------+
+| Arun Kumar    | 100000000002   | 250000.00 |
+| Ankit Verma   | 100000000005   | 310000.00 |
+| Vikas Mehta   | 100000000009   | 275000.00 |
+| Rahul Sharma  | 100000000012   | 500000.00 |
+| Priya Singh   | 100000000013   | 185000.00 |
+| Vikas Mehta   | 100000000015   | 198000.00 |
++---------------+----------------+-----------+
+6 rows in set (0.0042 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select DISTINCT balance
+                                                         -> from accounts
+                                                         -> order by balance DESC
+                                                         -> LIMIT 1 OFFSET 1;
++-----------+
+| balance   |
++-----------+
+| 310000.00 |
++-----------+
+1 row in set (0.0037 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select concat(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.branch_id, a.balance
+                                                         -> from accounts a
+                                                         -> join customers c ON a.customer_id = c.customer_id
+                                                         -> where a.balance > (
+                                                         ->     select avg(sub.balance)
+                                                         ->     from accounts sub
+                                                         ->     where sub.branch_id = a.branch_id
+                                                         ->
+                                                         -> ;
+ERROR: 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 7
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > SELECT CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.branch_id, a.balance
+                                                         -> FROM accounts a
+                                                         -> JOIN customers c ON a.customer_id = c.customer_id
+                                                         -> WHERE a.balance > (
+                                                         ->     SELECT AVG(sub.balance)
+                                                         ->     FROM accounts sub
+                                                         ->     WHERE sub.branch_id = a.branch_id
+                                                         -> );
++---------------+----------------+-----------+-----------+
+| customer_name | account_number | branch_id | balance   |
++---------------+----------------+-----------+-----------+
+| Arun Kumar    | 100000000002   |         1 | 250000.00 |
+| Rahul Sharma  | 100000000012   |         3 | 500000.00 |
+| Ankit Verma   | 100000000005   |         1 | 310000.00 |
+| Vikas Mehta   | 100000000009   |         2 | 275000.00 |
+| Vikas Mehta   | 100000000015   |         2 | 198000.00 |
+| Mohit Agarwal | 100000000011   |         4 | 156000.00 |
++---------------+----------------+-----------+-----------+
+6 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select concat(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.branch_id, a.balance from accounts a join customers c ON a.customer_id = c.customer_id where a.balance > (     select avg(sub.balance)     from accounts sub     where sub.branch_id = a.branch_id);
++---------------+----------------+-----------+-----------+
+| customer_name | account_number | branch_id | balance   |
++---------------+----------------+-----------+-----------+
+| Arun Kumar    | 100000000002   |         1 | 250000.00 |
+| Rahul Sharma  | 100000000012   |         3 | 500000.00 |
+| Ankit Verma   | 100000000005   |         1 | 310000.00 |
+| Vikas Mehta   | 100000000009   |         2 | 275000.00 |
+| Vikas Mehta   | 100000000015   |         2 | 198000.00 |
+| Mohit Agarwal | 100000000011   |         4 | 156000.00 |
++---------------+----------------+-----------+-----------+
+6 rows in set (0.0015 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, t.amount, t.transaction_id, t.transaction_date
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> join transactions t ON a.account_id = t.account_id
+                                                         -> order by t.amount DESC
+                                                         -> limit 1;
++-------------+---------------+-----------+----------------+---------------------+
+| customer_id | customer_name | amount    | transaction_id | transaction_date    |
++-------------+---------------+-----------+----------------+---------------------+
+|           2 | Rahul Sharma  | 500000.00 |           1024 | 2026-01-10 13:00:00 |
++-------------+---------------+-----------+----------------+---------------------+
+1 row in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select b.branch_id, b.branch_name, SUM(a.balance) AS total_balance
+                                                         -> from branches b
+                                                         -> join accounts a ON b.branch_id = a.branch_id
+                                                         -> group by b.branch_id, b.branch_name
+                                                         -> order by total_balance DESC
+                                                         -> limit 1;
++-----------+--------------+---------------+
+| branch_id | branch_name  | total_balance |
++-----------+--------------+---------------+
+|         3 | Noida Branch |     842000.00 |
++-----------+--------------+---------------+
+1 row in set (0.0013 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, sum(a.balance) AS aggregate_balance
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> group by c.customer_id, customer_name;
++-------------+---------------+-------------------+
+| customer_id | customer_name | aggregate_balance |
++-------------+---------------+-------------------+
+|           1 | Arun Kumar    |         335000.00 |
+|           2 | Rahul Sharma  |         625000.00 |
+|           3 | Priya Singh   |         280000.00 |
+|           4 | Ankit Verma   |         310000.00 |
+|           5 | Neha Gupta    |          67000.00 |
+|           6 | Rohit Yadav   |         217000.00 |
+|           7 | Sneha Patel   |          43000.00 |
+|           8 | Vikas Mehta   |         473000.00 |
+|           9 | Kavita Joshi  |          89000.00 |
+|          10 | Mohit Agarwal |         156000.00 |
++-------------+---------------+-------------------+
+10 rows in set (0.0021 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, count(t.transaction_id) AS total_txns, COALESCE(SUM(t.amount), 0.00) AS total_amount
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> join transactions t ON a.account_id = t.account_id
+                                                         -> group by c.customer_id, customer_name;
++-------------+---------------+------------+--------------+
+| customer_id | customer_name | total_txns | total_amount |
++-------------+---------------+------------+--------------+
+|           1 | Arun Kumar    |          5 |    205000.00 |
+|           2 | Rahul Sharma  |          3 |    545000.00 |
+|           3 | Priya Singh   |          4 |    115000.00 |
+|           4 | Ankit Verma   |          2 |     95000.00 |
+|           5 | Neha Gupta    |          2 |     28500.00 |
+|           6 | Rohit Yadav   |          4 |    108000.00 |
+|           7 | Sneha Patel   |          2 |     17500.00 |
+|           8 | Vikas Mehta   |          4 |    227000.00 |
+|           9 | Kavita Joshi  |          2 |     47000.00 |
+|          10 | Mohit Agarwal |          2 |     82000.00 |
++-------------+---------------+------------+--------------+
+10 rows in set (0.0014 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select b.branch_id, b.branch_name, ROUND(AVG(a.balance), 2) AS avg_balance
+                                                         -> from branches b
+                                                         -> join accounts a ON b.branch_id = a.branch_id
+                                                         -> group by b.branch_id, b.branch_name;
++-----------+----------------------+-------------+
+| branch_id | branch_name          | avg_balance |
++-----------+----------------------+-------------+
+|         1 | RRGI Main Branch     |   178000.00 |
+|         2 | Delhi Central Branch |   188250.00 |
+|         3 | Noida Branch         |   210500.00 |
+|         4 | Meerut Branch        |   122500.00 |
+|         5 | Lucknow Branch       |    43000.00 |
++-----------+----------------------+-------------+
+5 rows in set (0.0017 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > with customer_totals AS (
+                                                         ->     select customer_id, SUM(balance) AS total_balance
+                                                         ->     from accounts
+                                                         ->     group by customer_id
+                                                         -> )
+                                                         -> select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, ct.total_balance
+                                                         -> from customer_totals ct
+                                                         -> join customers c ON ct.customer_id = c.customer_id
+                                                         -> where ct.total_balance > (SELECT AVG(total_balance) FROM customer_totals);
++-------------+---------------+---------------+
+| customer_id | customer_name | total_balance |
++-------------+---------------+---------------+
+|           1 | Arun Kumar    |     335000.00 |
+|           2 | Rahul Sharma  |     625000.00 |
+|           3 | Priya Singh   |     280000.00 |
+|           4 | Ankit Verma   |     310000.00 |
+|           8 | Vikas Mehta   |     473000.00 |
++-------------+---------------+---------------+
+5 rows in set (0.0035 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > with branch_ranked AS (
+                                                         ->     select b.branch_name, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance,
+                                                         ->            ROW_NUMBER() OVER (PARTITION BY a.branch_id ORDER BY a.balance DESC) AS rnk
+                                                         ->     from accounts a
+                                                         ->     join customers c ON a.customer_id = c.customer_id
+                                                         ->     join branches b ON a.branch_id = b.branch_id
+                                                         -> )
+                                                         -> select branch_name, customer_name, account_number, balance
+                                                         -> from branch_ranked
+                                                         -> where rnk = 1;
++----------------------+---------------+----------------+-----------+
+| branch_name          | customer_name | account_number | balance   |
++----------------------+---------------+----------------+-----------+
+| RRGI Main Branch     | Ankit Verma   | 100000000005   | 310000.00 |
+| Delhi Central Branch | Vikas Mehta   | 100000000009   | 275000.00 |
+| Noida Branch         | Rahul Sharma  | 100000000012   | 500000.00 |
+| Meerut Branch        | Mohit Agarwal | 100000000011   | 156000.00 |
+| Lucknow Branch       | Sneha Patel   | 100000000008   |  43000.00 |
++----------------------+---------------+----------------+-----------+
+5 rows in set (0.0034 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, sum(a.balance) AS total_balance,
+                                                         ->        DENSE_RANK() OVER (ORDER BY SUM(a.balance) DESC) AS balance_rank
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> group by c.customer_id, customer_name;
++-------------+---------------+---------------+--------------+
+| customer_id | customer_name | total_balance | balance_rank |
++-------------+---------------+---------------+--------------+
+|           2 | Rahul Sharma  |     625000.00 |            1 |
+|           8 | Vikas Mehta   |     473000.00 |            2 |
+|           1 | Arun Kumar    |     335000.00 |            3 |
+|           4 | Ankit Verma   |     310000.00 |            4 |
+|           3 | Priya Singh   |     280000.00 |            5 |
+|           6 | Rohit Yadav   |     217000.00 |            6 |
+|          10 | Mohit Agarwal |     156000.00 |            7 |
+|           9 | Kavita Joshi  |      89000.00 |            8 |
+|           5 | Neha Gupta    |      67000.00 |            9 |
+|           7 | Sneha Patel   |      43000.00 |           10 |
++-------------+---------------+---------------+--------------+
+10 rows in set (0.0017 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > with ranked_branch_cust AS (
+                                                         ->     select b.branch_name, CONCAT(c.first_name, ' ', c.last_name) AS customer_name, a.account_number, a.balance,
+                                                         ->            DENSE_RANK() OVER (PARTITION BY a.branch_id ORDER BY a.balance DESC) AS branch_rank
+                                                         ->     from accounts a
+                                                         ->     join customers c ON a.customer_id = c.customer_id
+                                                         ->     join branches b ON a.branch_id = b.branch_id
+                                                         -> )
+                                                         -> select branch_name, branch_rank, customer_name, account_number, balance
+                                                         -> from ranked_branch_cust
+                                                         -> where branch_rank <= 3;
++----------------------+-------------+---------------+----------------+-----------+
+| branch_name          | branch_rank | customer_name | account_number | balance   |
++----------------------+-------------+---------------+----------------+-----------+
+| RRGI Main Branch     |           1 | Ankit Verma   | 100000000005   | 310000.00 |
+| RRGI Main Branch     |           2 | Arun Kumar    | 100000000002   | 250000.00 |
+| RRGI Main Branch     |           3 | Arun Kumar    | 100000000001   |  85000.00 |
+| Delhi Central Branch |           1 | Vikas Mehta   | 100000000009   | 275000.00 |
+| Delhi Central Branch |           2 | Vikas Mehta   | 100000000015   | 198000.00 |
+| Delhi Central Branch |           3 | Priya Singh   | 100000000013   | 185000.00 |
+| Noida Branch         |           1 | Rahul Sharma  | 100000000012   | 500000.00 |
+| Noida Branch         |           2 | Rohit Yadav   | 100000000007   | 145000.00 |
+| Noida Branch         |           3 | Rahul Sharma  | 100000000003   | 125000.00 |
+| Meerut Branch        |           1 | Mohit Agarwal | 100000000011   | 156000.00 |
+| Meerut Branch        |           2 | Kavita Joshi  | 100000000010   |  89000.00 |
+| Lucknow Branch       |           1 | Sneha Patel   | 100000000008   |  43000.00 |
++----------------------+-------------+---------------+----------------+-----------+
+12 rows in set (0.0018 sec)
+ MySQL  localhost:33060+ ssl  bank_management_system  SQL > select CONCAT(c.first_name, ' ', c.last_name) AS customer_name, t.transaction_id, t.transaction_type, t.amount, t.transaction_date,
+                                                         ->        DENSE_RANK() OVER (PARTITION BY c.customer_id ORDER BY t.amount DESC) AS txn_rank
+                                                         -> from customers c
+                                                         -> join accounts a ON c.customer_id = a.customer_id
+                                                         -> join transactions t ON a.account_id = t.account_id;
++---------------+----------------+------------------+-----------+---------------------+----------+
+| customer_name | transaction_id | transaction_type | amount    | transaction_date    | txn_rank |
++---------------+----------------+------------------+-----------+---------------------+----------+
+| Arun Kumar    |           1004 | DEPOSIT          | 100000.00 | 2026-01-06 11:00:00 |        1 |
+| Arun Kumar    |           1001 | DEPOSIT          |  50000.00 | 2026-01-05 10:15:00 |        2 |
+| Arun Kumar    |           1005 | WITHDRAWAL       |  25000.00 | 2026-01-12 12:10:00 |        3 |
+| Arun Kumar    |           1003 | DEPOSIT          |  20000.00 | 2026-01-15 09:30:00 |        4 |
+| Arun Kumar    |           1002 | WITHDRAWAL       |  10000.00 | 2026-01-10 14:20:00 |        5 |
+| Rahul Sharma  |           1024 | DEPOSIT          | 500000.00 | 2026-01-10 13:00:00 |        1 |
+| Rahul Sharma  |           1006 | DEPOSIT          |  30000.00 | 2026-01-03 08:45:00 |        2 |
+| Rahul Sharma  |           1007 | WITHDRAWAL       |  15000.00 | 2026-01-08 18:20:00 |        3 |
+| Priya Singh   |           1025 | DEPOSIT          |  50000.00 | 2026-01-08 09:40:00 |        1 |
+| Priya Singh   |           1008 | DEPOSIT          |  45000.00 | 2026-01-09 10:30:00 |        2 |
+| Priya Singh   |           1026 | PAYMENT          |  15000.00 | 2026-01-19 11:50:00 |        3 |
+| Priya Singh   |           1009 | PAYMENT          |   5000.00 | 2026-01-14 16:40:00 |        4 |
+| Ankit Verma   |           1010 | DEPOSIT          |  75000.00 | 2026-01-02 11:15:00 |        1 |
+| Ankit Verma   |           1011 | WITHDRAWAL       |  20000.00 | 2026-01-11 13:25:00 |        2 |
+| Neha Gupta    |           1012 | DEPOSIT          |  25000.00 | 2026-01-04 09:15:00 |        1 |
+| Neha Gupta    |           1013 | PAYMENT          |   3500.00 | 2026-01-18 19:10:00 |        2 |
+| Rohit Yadav   |           1014 | DEPOSIT          |  60000.00 | 2026-01-05 10:00:00 |        1 |
+| Rohit Yadav   |           1027 | DEPOSIT          |  30000.00 | 2026-01-11 10:20:00 |        2 |
+| Rohit Yadav   |           1015 | WITHDRAWAL       |  10000.00 | 2026-01-09 17:30:00 |        3 |
+| Rohit Yadav   |           1028 | WITHDRAWAL       |   8000.00 | 2026-01-20 18:00:00 |        4 |
+| Sneha Patel   |           1016 | DEPOSIT          |  15000.00 | 2026-01-07 08:30:00 |        1 |
+| Sneha Patel   |           1017 | PAYMENT          |   2500.00 | 2026-01-16 20:15:00 |        2 |
+| Vikas Mehta   |           1029 | DEPOSIT          |  90000.00 | 2026-01-12 09:00:00 |        1 |
+| Vikas Mehta   |           1018 | DEPOSIT          |  85000.00 | 2026-01-03 12:00:00 |        2 |
+| Vikas Mehta   |           1019 | WITHDRAWAL       |  30000.00 | 2026-01-13 15:45:00 |        3 |
+| Vikas Mehta   |           1030 | PAYMENT          |  22000.00 | 2026-01-21 12:45:00 |        4 |
+| Kavita Joshi  |           1020 | DEPOSIT          |  40000.00 | 2026-01-04 11:30:00 |        1 |
+| Kavita Joshi  |           1021 | PAYMENT          |   7000.00 | 2026-01-17 14:20:00 |        2 |
+| Mohit Agarwal |           1022 | DEPOSIT          |  70000.00 | 2026-01-06 10:10:00 |        1 |
+| Mohit Agarwal |           1023 | WITHDRAWAL       |  12000.00 | 2026-01-15 16:30:00 |        2 |
++---------------+----------------+------------------+-----------+---------------------+----------+
+30 rows in set (0.0016 sec)
